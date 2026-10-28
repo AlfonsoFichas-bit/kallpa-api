@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 
 	"kallpa-api/internal/ai"
 	"kallpa-api/internal/customers"
@@ -103,7 +104,7 @@ func (s *service) ProcessMessage(ctx context.Context, req *MessageRequest) (*Mes
 	aiLog.ChatSessionID = &session.ID
 	if err := s.repo.CreateLog(ctx, aiLog); err != nil {
 		// Log the error but don't fail the user interaction if logging fails
-		// (Assuming a logger is available, or we just silently fail for now per previous setup)
+		slog.Error("failed to create AI log", "error", err)
 	}
 
 	// 6. Map to Domain Response Contract
@@ -117,9 +118,10 @@ func (s *service) ProcessMessage(ctx context.Context, req *MessageRequest) (*Mes
 	}
 
 	// Mocking behavior for specific intents just to fulfill contract fields conditionally
-	if intent == "add_to_cart" {
+	switch intent {
+	case "add_to_cart":
 		res.RequiresConfirmation = true
-	} else if intent == "confirm_order" {
+	case "confirm_order":
 		oid := int64(42)
 		res.OrderID = &oid
 		url := "https://example.com/qr"

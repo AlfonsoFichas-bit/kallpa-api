@@ -33,10 +33,11 @@ func (d *DummyProvider) ProcessMessage(ctx context.Context, storeID int64, messa
 	reply := "Entiendo, gracias por tu mensaje."
 
 	// Simple keyword matching for testing intents
-	if message == "Quiero 2 bolsas de quinua" {
+	switch message {
+	case "Quiero 2 bolsas de quinua":
 		intent = "add_to_cart"
 		reply = "Tengo quinua real disponible. ¿Deseas 2 unidades?"
-	} else if message == "Si" {
+	case "Si":
 		intent = "confirm_order"
 		reply = "Pedido confirmado. Tu total es 100."
 	}

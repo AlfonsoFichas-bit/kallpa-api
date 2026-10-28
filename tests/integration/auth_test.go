@@ -58,7 +58,7 @@ func TestMain(m *testing.M) {
 	// Add a dummy protected route for testing
 	authService := auth.NewService(auth.NewUserRepository(testDB), cfg.JWTSecret)
 	protectedGroup := testRouter.Group("/v1/protected")
-	protectedGroup.Use(auth.AuthMiddleware(authService))
+	protectedGroup.Use(auth.AuthMiddleware(authService, ""))
 	protectedGroup.GET("/admin-only", func(c *echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"message": "success"})
 	}, auth.RequireRole(domain.RoleSuperadmin))

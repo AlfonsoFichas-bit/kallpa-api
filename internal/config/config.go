@@ -9,10 +9,11 @@ import (
 
 // Config represents the application configuration settings.
 type Config struct {
-	DBName    string
-	Port      string
-	LogLevel  string
-	JWTSecret string
+	DBName       string
+	Port         string
+	LogLevel     string
+	JWTSecret    string
+	ServiceToken string
 }
 
 // Load retrieves configuration from environment variables and an optional .env file.
@@ -21,10 +22,11 @@ func Load() *Config {
 	_ = godotenv.Load()
 
 	cfg := &Config{
-		DBName:    getEnv("DB_NAME", "kallpa.db"),
-		Port:      getEnv("PORT", "8080"),
-		LogLevel:  getEnv("LOG_LEVEL", "info"),
-		JWTSecret: getEnv("JWT_SECRET", ""),
+		DBName:       getEnv("DB_NAME", "kallpa.db"),
+		Port:         getEnv("PORT", "8080"),
+		LogLevel:     getEnv("LOG_LEVEL", "info"),
+		JWTSecret:    getEnv("JWT_SECRET", ""),
+		ServiceToken: getEnv("SERVICE_TOKEN", ""),
 	}
 
 	if cfg.JWTSecret == "" {

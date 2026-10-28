@@ -77,7 +77,7 @@ func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 
 	// Protected routes
 	protected := v1.Group("")
-	protected.Use(auth.AuthMiddleware(authService))
+	protected.Use(auth.AuthMiddleware(authService, cfg.ServiceToken))
 
 	// Inventory module
 	inventoryRepo := inventory.NewProductRepository(db)
@@ -106,7 +106,7 @@ func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 	// AI and Chat Module
 	aiProvider := ai.NewDummyProvider()
 	chatRepo := chat.NewRepository(db)
-	chatService := chat.NewService(chatRepo, customerService, aiProvider)
+	chatService := chat.NewService(chatRepo, customerService, aiProvider, salesService)
 	chatHandler := chat.NewHandler(chatService)
 	chat.RegisterHandlers(protected, chatHandler)
 

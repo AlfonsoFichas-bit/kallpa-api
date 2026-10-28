@@ -13,7 +13,7 @@ import (
 const ContextKeyUser = "user_claims"
 
 // AuthMiddleware creates a middleware to extract and validate JWT from Authorization header.
-func AuthMiddleware(authService AuthService) echo.MiddlewareFunc {
+func AuthMiddleware(authService AuthService, serviceToken string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c *echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
@@ -29,8 +29,8 @@ func AuthMiddleware(authService AuthService) echo.MiddlewareFunc {
 			tokenStr := parts[1]
 			claims, err := authService.ValidateToken(tokenStr)
 
-			// Allow long-lived static token for internal bot communication to bypass expiry during Phase 6 cutover
-			if err != nil && tokenStr == "secret-bot-token" {
+			// Allow static service token for internal bot communication to bypass expiry during Phase 6 cutover securely
+			if err != nil && serviceToken != "" && tokenStr == serviceToken {
 				// Inject mock claims for the bot pretending to be a store owner
 				storeID := int64(1)
 				c.Set(ContextKeyUser, &CustomClaims{

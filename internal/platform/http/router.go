@@ -93,7 +93,7 @@ func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 
 	// Sales module
 	salesRepo := sales.NewOrderRepository(db)
-	salesService := sales.NewService(salesRepo, inventoryRepo)
+	salesService := sales.NewService(salesRepo, inventoryRepo, customerRepo)
 	salesHandler := sales.NewSalesHandler(salesService)
 	sales.RegisterHandlers(protected, salesHandler)
 

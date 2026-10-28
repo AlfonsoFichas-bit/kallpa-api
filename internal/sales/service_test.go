@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/shopspring/decimal"
+
 	"kallpa-api/internal/domain"
 	"kallpa-api/internal/inventory"
 )
@@ -74,6 +75,7 @@ func (m *mockProductRepo) GetProductByID(ctx context.Context, storeID, productID
 func (m *mockProductRepo) GetVariantByID(ctx context.Context, variantID int64) (*domain.ProductVariant, error) {
 	prod := &domain.Product{
 		BasePrice: decimal.NewFromInt(10),
+		StoreID:   1,
 	}
 	// Let's vary the additional price based on variant ID to simulate different prices
 	additional := decimal.NewFromInt(0)
@@ -95,9 +97,25 @@ func (m *mockProductRepo) LowStockQuery(ctx context.Context, storeID int64, thre
 	return nil, nil
 }
 
+type mockCustomerRepo struct {
+}
+
+func (m *mockCustomerRepo) FindByTelegramID(ctx context.Context, storeID, telegramID int64) (*domain.Customer, error) {
+	return nil, nil
+}
+func (m *mockCustomerRepo) UpsertByTelegramID(ctx context.Context, storeID, telegramID int64, name string) (*domain.Customer, error) {
+	return nil, nil
+}
+func (m *mockCustomerRepo) ListByStore(ctx context.Context, storeID int64, status string) ([]domain.Customer, error) {
+	return nil, nil
+}
+func (m *mockCustomerRepo) GetByID(ctx context.Context, storeID, customerID int64) (*domain.Customer, error) {
+	return &domain.Customer{ID: customerID, StoreID: storeID}, nil
+}
+
 func TestSalesService_CreateOrder_Totals(t *testing.T) {
 	repo := &mockOrderRepo{}
-	svc := NewService(repo, &mockProductRepo{})
+	svc := NewService(repo, &mockProductRepo{}, &mockCustomerRepo{})
 	ctx := context.Background()
 
 	vid1 := int64(1)
@@ -133,7 +151,7 @@ func TestSalesService_ValidStatusTransitions(t *testing.T) {
 			{ID: 2, StoreID: 1, Status: domain.OrderStatusDelivered},
 		},
 	}
-	svc := NewService(repo, &mockProductRepo{})
+	svc := NewService(repo, &mockProductRepo{}, &mockCustomerRepo{})
 	ctx := context.Background()
 
 	// Valid transition: draft -> pending_payment
@@ -156,7 +174,7 @@ func TestSalesService_Idempotency(t *testing.T) {
 			{ID: 1, StoreID: 1, IdempotencyKey: &idempotencyKey},
 		},
 	}
-	svc := NewService(repo, &mockProductRepo{})
+	svc := NewService(repo, &mockProductRepo{}, &mockCustomerRepo{})
 	ctx := context.Background()
 
 	order := &domain.Order{

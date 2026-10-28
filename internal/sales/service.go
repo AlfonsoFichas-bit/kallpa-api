@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"github.com/shopspring/decimal"
+
+	"kallpa-api/internal/customers"
 	"kallpa-api/internal/domain"
 	"kallpa-api/internal/inventory"
 )
@@ -26,19 +28,30 @@ type SalesService interface {
 type service struct {
 	repo          OrderRepository
 	inventoryRepo inventory.ProductRepository
+	customerRepo  customers.CustomerRepository
 }
 
 // NewService creates a new SalesService.
-func NewService(repo OrderRepository, inventoryRepo inventory.ProductRepository) SalesService {
+func NewService(repo OrderRepository, inventoryRepo inventory.ProductRepository, customerRepo customers.CustomerRepository) SalesService {
 	return &service{
 		repo:          repo,
 		inventoryRepo: inventoryRepo,
+		customerRepo:  customerRepo,
 	}
 }
 
 // CreateOrder validates items, calculates totals, handles idempotency, and saves.
 func (s *service) CreateOrder(ctx context.Context, storeID int64, order *domain.Order) (*domain.Order, error) {
 	order.StoreID = storeID
+
+	// Validate customer belongs to this store
+	customer, err := s.customerRepo.GetByID(ctx, storeID, order.CustomerID)
+	if err != nil {
+		return nil, err
+	}
+	if customer == nil {
+		return nil, fmt.Errorf("customer %d not found for this store", order.CustomerID)
+	}
 
 	if order.IdempotencyKey != nil && *order.IdempotencyKey != "" {
 		existing, err := s.repo.FindByIdempotencyKey(ctx, storeID, *order.IdempotencyKey)
@@ -62,6 +75,10 @@ func (s *service) CreateOrder(ctx context.Context, storeID int64, order *domain.
 			}
 			if variant == nil {
 				return nil, fmt.Errorf("variant %d not found", *item.ProductVariantID)
+			}
+
+			if variant.Product == nil || variant.Product.StoreID != storeID {
+				return nil, fmt.Errorf("variant %d does not belong to this store", *item.ProductVariantID)
 			}
 
 			// Compute effective unit price

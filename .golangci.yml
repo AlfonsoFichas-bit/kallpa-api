@@ -1,0 +1,69 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    # Linters estándar recomendados
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    # Calidad de código y buenas prácticas
+    - copyloopvar
+    - errorlint
+    - gocritic
+    - gosec
+    - misspell
+    - revive
+    - unconvert
+    - unparam
+    # Específicos para APIs y servicios web
+    - bodyclose
+    - noctx
+    - sqlclosecheck
+
+  exclusions:
+    paths:
+      - tests/
+      - test/
+
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+    revive:
+      rules:
+        - name: exported
+          arguments:
+            - disableStutteringCheck
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+      disabled-checks:
+        - whyNoLint
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    paths:
+      - tests/
+      - test/
+
+  settings:
+    goimports:
+      local-prefixes:
+        - kallpa-api
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

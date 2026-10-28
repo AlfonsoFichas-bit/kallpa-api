@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"kallpa-api/internal/config"
+	kallpadomain "kallpa-api/internal/domain"
 	"kallpa-api/internal/platform/db"
 	kallpahttp "kallpa-api/internal/platform/http"
 	"kallpa-api/internal/platform/logger"
@@ -33,10 +34,12 @@ func main() {
 	}
 	slog.Info("Database connected", "db_name", cfg.DBName)
 
-	// TODO: GORM AutoMigrate for User will go here once the model is created.
+	if err := database.AutoMigrate(&kallpadomain.User{}); err != nil {
+		log.Fatalf("Database migration failed: %v", err)
+	}
 
 	// 4. Initialize HTTP router
-	router := kallpahttp.NewRouter(database)
+	router := kallpahttp.NewRouter(database, cfg)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,

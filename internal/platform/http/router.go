@@ -5,13 +5,26 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v5"
 	"github.com/labstack/echo/v5/middleware"
 	"gorm.io/gorm"
+
+	"kallpa-api/internal/auth"
+	"kallpa-api/internal/config"
 )
 
-func NewRouter(db *gorm.DB) *echo.Echo {
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
+
+func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 	e := echo.New()
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// Middlewares
 	e.Use(middleware.RequestID())
@@ -41,6 +54,15 @@ func NewRouter(db *gorm.DB) *echo.Echo {
 		return c.JSON(http.StatusOK, map[string]string{"status": "ready"})
 	})
 
+	// Auth module
+	userRepo := auth.NewUserRepository(db)
+	authService := auth.NewService(userRepo, cfg.JWTSecret)
+	authHandler := auth.NewAuthHandler(authService)
+
+	v1 := e.Group("/v1")
+	authGroup := v1.Group("/auth")
+	auth.RegisterHandlers(authGroup, authHandler)
+
 	return e
 }
 
@@ -54,8 +76,6 @@ func slogMiddleware() echo.MiddlewareFunc {
 			err := next(c)
 
 			// Get status code
-			// c.Response() in Echo v5 returns an interface that embeds http.ResponseWriter
-			// We can get the actual *echo.Response using type assertion or by directly accessing Response
 			var status int
 			if eRes, ok := c.Response().(*echo.Response); ok {
 				status = eRes.Status

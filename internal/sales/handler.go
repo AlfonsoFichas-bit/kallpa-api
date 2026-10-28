@@ -13,8 +13,8 @@ import (
 
 // CreateOrderRequest is the payload to create an order.
 type CreateOrderRequest struct {
-	CustomerID int64                  `json:"customer_id" validate:"required"`
-	Items      []CreateOrderItem      `json:"items" validate:"required,min=1"`
+	CustomerID int64             `json:"customer_id" validate:"required"`
+	Items      []CreateOrderItem `json:"items" validate:"required,min=1"`
 }
 
 // CreateOrderItem represents a single line in a new order.

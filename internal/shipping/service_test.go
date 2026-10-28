@@ -2,6 +2,7 @@ package shipping
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/shopspring/decimal"
@@ -94,7 +95,7 @@ func TestShippingService_AssignZoneToOrder(t *testing.T) {
 
 	// Invalid zone assignment
 	err = svc.AssignZoneToOrder(context.Background(), 1, 102, 99)
-	if err != ErrZoneNotFound {
+	if !errors.Is(err, ErrZoneNotFound) {
 		t.Errorf("expected ErrZoneNotFound, got %v", err)
 	}
 }

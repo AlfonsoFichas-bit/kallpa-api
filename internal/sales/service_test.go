@@ -2,6 +2,7 @@ package sales
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/shopspring/decimal"
@@ -67,7 +68,7 @@ type mockProductRepo struct {
 func (m *mockProductRepo) ListProducts(ctx context.Context, storeID int64, query inventory.ProductSearchQuery) ([]domain.Product, error) {
 	return nil, nil
 }
-func (m *mockProductRepo) GetProductByID(ctx context.Context, storeID int64, productID int64) (*domain.Product, error) {
+func (m *mockProductRepo) GetProductByID(ctx context.Context, storeID, productID int64) (*domain.Product, error) {
 	return nil, nil
 }
 func (m *mockProductRepo) GetVariantByID(ctx context.Context, variantID int64) (*domain.ProductVariant, error) {
@@ -81,9 +82,9 @@ func (m *mockProductRepo) GetVariantByID(ctx context.Context, variantID int64) (
 	}
 
 	return &domain.ProductVariant{
-		ID: variantID,
-		ProductID: 1,
-		Product: prod,
+		ID:              variantID,
+		ProductID:       1,
+		Product:         prod,
 		AdditionalPrice: additional,
 	}, nil
 }
@@ -143,7 +144,7 @@ func TestSalesService_ValidStatusTransitions(t *testing.T) {
 
 	// Invalid transition: delivered -> cancelled
 	err = svc.UpdateOrderStatus(ctx, 1, 2, domain.OrderStatusCancelled)
-	if err != ErrInvalidStatusTransition {
+	if !errors.Is(err, ErrInvalidStatusTransition) {
 		t.Errorf("expected ErrInvalidStatusTransition, got %v", err)
 	}
 }

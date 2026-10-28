@@ -10,44 +10,55 @@ import (
 type OrderStatus string
 
 const (
-	OrderStatusDraft          OrderStatus = "draft"
+	// OrderStatusDraft represents an order that is still being built.
+	OrderStatusDraft OrderStatus = "draft"
+	// OrderStatusPendingPayment represents an order awaiting customer payment.
 	OrderStatusPendingPayment OrderStatus = "pending_payment"
-	OrderStatusPaid           OrderStatus = "paid"
-	OrderStatusProcessing     OrderStatus = "processing"
-	OrderStatusShipped        OrderStatus = "shipped"
-	OrderStatusDelivered      OrderStatus = "delivered"
-	OrderStatusCancelled      OrderStatus = "cancelled"
-	OrderStatusReturned       OrderStatus = "returned"
+	// OrderStatusPaid represents a fully paid order.
+	OrderStatusPaid OrderStatus = "paid"
+	// OrderStatusProcessing represents an order being prepared for shipping.
+	OrderStatusProcessing OrderStatus = "processing"
+	// OrderStatusShipped represents an order that has left the store.
+	OrderStatusShipped OrderStatus = "shipped"
+	// OrderStatusDelivered represents a successfully completed order.
+	OrderStatusDelivered OrderStatus = "delivered"
+	// OrderStatusCancelled represents an order aborted by the store or customer.
+	OrderStatusCancelled OrderStatus = "cancelled"
+	// OrderStatusReturned represents an order returned by the customer.
+	OrderStatusReturned OrderStatus = "returned"
 )
 
 // PaymentMethod specifies how the order was paid.
 type PaymentMethod string
 
 const (
-	PaymentMethodQRTransfer     PaymentMethod = "qr_transfer"
+	// PaymentMethodQRTransfer implies payment via bank QR.
+	PaymentMethodQRTransfer PaymentMethod = "qr_transfer"
+	// PaymentMethodCashOnDelivery implies payment will be collected at delivery.
 	PaymentMethodCashOnDelivery PaymentMethod = "cash_on_delivery"
-	PaymentMethodCardLink       PaymentMethod = "card_link"
+	// PaymentMethodCardLink implies payment via an external credit card gateway link.
+	PaymentMethodCardLink PaymentMethod = "card_link"
 )
 
 // Order represents a customer's purchase.
 type Order struct {
-	ID             int64          `json:"id" gorm:"primaryKey;autoIncrement"`
-	StoreID        int64          `json:"store_id" gorm:"index"`
-	CustomerID     int64          `json:"customer_id" gorm:"index"`
-	Status         OrderStatus    `json:"status" gorm:"type:varchar(50);default:'draft'"`
-	PaymentMethod  *PaymentMethod `json:"payment_method" gorm:"type:varchar(50)"`
+	ID            int64          `json:"id" gorm:"primaryKey;autoIncrement"`
+	StoreID       int64          `json:"store_id" gorm:"index"`
+	CustomerID    int64          `json:"customer_id" gorm:"index"`
+	Status        OrderStatus    `json:"status" gorm:"type:varchar(50);default:'draft'"`
+	PaymentMethod *PaymentMethod `json:"payment_method" gorm:"type:varchar(50)"`
 
-	Subtotal       decimal.Decimal `json:"subtotal" gorm:"type:decimal(12,2);not null;default:0"`
-	DeliveryCost   decimal.Decimal `json:"delivery_cost" gorm:"type:decimal(12,2);default:0"`
-	Total          decimal.Decimal `json:"total" gorm:"type:decimal(12,2);not null;default:0"`
+	Subtotal     decimal.Decimal `json:"subtotal" gorm:"type:decimal(12,2);not null;default:0"`
+	DeliveryCost decimal.Decimal `json:"delivery_cost" gorm:"type:decimal(12,2);default:0"`
+	Total        decimal.Decimal `json:"total" gorm:"type:decimal(12,2);not null;default:0"`
 
-	DeliveryZoneID *int64  `json:"delivery_zone_id" gorm:"index"`
+	DeliveryZoneID  *int64  `json:"delivery_zone_id" gorm:"index"`
 	ShippingAddress *string `json:"shipping_address" gorm:"type:text"`
 
 	PaymentProofURL *string `json:"payment_proof_url" gorm:"type:text"`
 	Notes           *string `json:"notes" gorm:"type:text"`
 
-	IdempotencyKey  *string `json:"idempotency_key" gorm:"type:varchar(255);uniqueIndex"`
+	IdempotencyKey *string `json:"idempotency_key" gorm:"type:varchar(255);uniqueIndex"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

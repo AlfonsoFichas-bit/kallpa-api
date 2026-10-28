@@ -1,0 +1,5 @@
+kallpa.db
+data/
+api_bin
+bin/
+.env*

@@ -11,7 +11,9 @@ import (
 	"github.com/labstack/echo/v5/middleware"
 	"gorm.io/gorm"
 
+	"kallpa-api/internal/ai"
 	"kallpa-api/internal/auth"
+	"kallpa-api/internal/chat"
 	"kallpa-api/internal/config"
 	"kallpa-api/internal/customers"
 	"kallpa-api/internal/inventory"
@@ -98,6 +100,13 @@ func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 	shippingService := shipping.NewService(shippingRepo, salesService)
 	shippingHandler := shipping.NewShippingHandler(shippingService)
 	shipping.RegisterHandlers(protected, shippingHandler)
+
+	// AI and Chat Module
+	aiProvider := ai.NewDummyProvider()
+	chatRepo := chat.NewRepository(db)
+	chatService := chat.NewService(chatRepo, customerService, aiProvider)
+	chatHandler := chat.NewHandler(chatService)
+	chat.RegisterHandlers(protected, chatHandler)
 
 	return e
 }

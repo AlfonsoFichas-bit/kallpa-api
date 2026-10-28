@@ -43,6 +43,8 @@ func main() {
 		&kallpadomain.Order{},
 		&kallpadomain.OrderItem{},
 		&kallpadomain.DeliveryZone{},
+		&kallpadomain.ChatSession{},
+		&kallpadomain.AiLog{},
 	); err != nil {
 		log.Fatalf("Database migration failed: %v", err)
 	}

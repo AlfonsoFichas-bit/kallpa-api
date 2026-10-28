@@ -44,6 +44,9 @@ func TestMain(m *testing.M) {
 		&domain.ProductVariant{},
 		&domain.TelegramIdentity{},
 		&domain.Customer{},
+		&domain.Order{},
+		&domain.OrderItem{},
+		&domain.DeliveryZone{},
 	)
 
 	testRouter = kallpahttp.NewRouter(testDB, cfg)

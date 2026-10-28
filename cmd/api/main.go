@@ -40,6 +40,9 @@ func main() {
 		&kallpadomain.ProductVariant{},
 		&kallpadomain.TelegramIdentity{},
 		&kallpadomain.Customer{},
+		&kallpadomain.Order{},
+		&kallpadomain.OrderItem{},
+		&kallpadomain.DeliveryZone{},
 	); err != nil {
 		log.Fatalf("Database migration failed: %v", err)
 	}

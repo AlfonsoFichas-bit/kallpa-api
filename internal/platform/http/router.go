@@ -15,6 +15,8 @@ import (
 	"kallpa-api/internal/config"
 	"kallpa-api/internal/customers"
 	"kallpa-api/internal/inventory"
+	"kallpa-api/internal/sales"
+	"kallpa-api/internal/shipping"
 )
 
 // CustomValidator wraps the standard validator for Echo.
@@ -84,6 +86,18 @@ func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 	customerService := customers.NewService(customerRepo)
 	customerHandler := customers.NewCustomerHandler(customerService)
 	customers.RegisterHandlers(protected, customerHandler)
+
+	// Sales module
+	salesRepo := sales.NewOrderRepository(db)
+	salesService := sales.NewService(salesRepo, inventoryRepo)
+	salesHandler := sales.NewSalesHandler(salesService)
+	sales.RegisterHandlers(protected, salesHandler)
+
+	// Shipping module
+	shippingRepo := shipping.NewDeliveryZoneRepository(db)
+	shippingService := shipping.NewService(shippingRepo, salesService)
+	shippingHandler := shipping.NewShippingHandler(shippingService)
+	shipping.RegisterHandlers(protected, shippingHandler)
 
 	return e
 }

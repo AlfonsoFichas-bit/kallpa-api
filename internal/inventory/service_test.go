@@ -2,6 +2,7 @@ package inventory
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/shopspring/decimal"
@@ -15,36 +16,36 @@ type mockProductRepo struct {
 
 func (m *mockProductRepo) ListProducts(ctx context.Context, storeID int64, query ProductSearchQuery) ([]domain.Product, error) {
 	var result []domain.Product
-	for _, p := range m.products {
-		if p.StoreID == storeID {
-			result = append(result, p) // For tests, ignore query logic matching to keep it simple
+	for i := range m.products {
+		if m.products[i].StoreID == storeID {
+			result = append(result, m.products[i]) // For tests, ignore query logic matching to keep it simple
 		}
 	}
 	return result, nil
 }
 
-func (m *mockProductRepo) GetProductByID(ctx context.Context, storeID int64, productID int64) (*domain.Product, error) {
-	for _, p := range m.products {
-		if p.ID == productID && p.StoreID == storeID {
-			return &p, nil
+func (m *mockProductRepo) GetProductByID(ctx context.Context, storeID, productID int64) (*domain.Product, error) {
+	for i := range m.products {
+		if m.products[i].ID == productID && m.products[i].StoreID == storeID {
+			return &m.products[i], nil
 		}
 	}
 	return nil, nil
 }
 
 func (m *mockProductRepo) GetVariantByID(ctx context.Context, variantID int64) (*domain.ProductVariant, error) {
-	for _, v := range m.variants {
-		if v.ID == variantID {
-			return &v, nil
+	for i := range m.variants {
+		if m.variants[i].ID == variantID {
+			return &m.variants[i], nil
 		}
 	}
 	return nil, nil
 }
 
 func (m *mockProductRepo) UpdateStock(ctx context.Context, variantID int64, delta int) error {
-	for i, v := range m.variants {
-		if v.ID == variantID {
-			if v.StockQuantity+delta < 0 {
+	for i := range m.variants {
+		if m.variants[i].ID == variantID {
+			if m.variants[i].StockQuantity+delta < 0 {
 				return ErrInsufficientStock
 			}
 			m.variants[i].StockQuantity += delta
@@ -81,7 +82,7 @@ func TestInventoryService_AdjustStock(t *testing.T) {
 
 	// 2. Fail decrease (insufficient)
 	err = svc.AdjustStock(ctx, 1, 100, -3)
-	if err != ErrInsufficientStock {
+	if !errors.Is(err, ErrInsufficientStock) {
 		t.Errorf("expected ErrInsufficientStock, got %v", err)
 	}
 

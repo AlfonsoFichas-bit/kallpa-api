@@ -10,8 +10,8 @@ import (
 // InventoryService defines business operations for products and stock.
 type InventoryService interface {
 	SearchProducts(ctx context.Context, storeID int64, query string) ([]domain.Product, error)
-	GetProduct(ctx context.Context, storeID int64, productID int64) (*domain.Product, error)
-	AdjustStock(ctx context.Context, storeID int64, variantID int64, delta int) error
+	GetProduct(ctx context.Context, storeID, productID int64) (*domain.Product, error)
+	AdjustStock(ctx context.Context, storeID, variantID int64, delta int) error
 	GetLowStock(ctx context.Context, storeID int64, threshold int) ([]domain.ProductVariant, error)
 }
 
@@ -31,12 +31,12 @@ func (s *service) SearchProducts(ctx context.Context, storeID int64, query strin
 }
 
 // GetProduct returns a specific product.
-func (s *service) GetProduct(ctx context.Context, storeID int64, productID int64) (*domain.Product, error) {
+func (s *service) GetProduct(ctx context.Context, storeID, productID int64) (*domain.Product, error) {
 	return s.repo.GetProductByID(ctx, storeID, productID)
 }
 
 // AdjustStock updates the stock of a variant ensuring it belongs to the store.
-func (s *service) AdjustStock(ctx context.Context, storeID int64, variantID int64, delta int) error {
+func (s *service) AdjustStock(ctx context.Context, storeID, variantID int64, delta int) error {
 	variant, err := s.repo.GetVariantByID(ctx, variantID)
 	if err != nil {
 		return err

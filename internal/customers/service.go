@@ -8,9 +8,9 @@ import (
 
 // CustomerService defines business operations for customers.
 type CustomerService interface {
-	UpsertCustomerFromTelegram(ctx context.Context, storeID int64, telegramID int64, name string) (*domain.Customer, error)
+	UpsertCustomerFromTelegram(ctx context.Context, storeID, telegramID int64, name string) (*domain.Customer, error)
 	GetCustomers(ctx context.Context, storeID int64, status string) ([]domain.Customer, error)
-	GetCustomer(ctx context.Context, storeID int64, id int64) (*domain.Customer, error)
+	GetCustomer(ctx context.Context, storeID, id int64) (*domain.Customer, error)
 }
 
 type service struct {
@@ -23,7 +23,7 @@ func NewService(repo CustomerRepository) CustomerService {
 }
 
 // UpsertCustomerFromTelegram creates or retrieves a customer idempotently.
-func (s *service) UpsertCustomerFromTelegram(ctx context.Context, storeID int64, telegramID int64, name string) (*domain.Customer, error) {
+func (s *service) UpsertCustomerFromTelegram(ctx context.Context, storeID, telegramID int64, name string) (*domain.Customer, error) {
 	return s.repo.UpsertByTelegramID(ctx, storeID, telegramID, name)
 }
 
@@ -33,6 +33,6 @@ func (s *service) GetCustomers(ctx context.Context, storeID int64, status string
 }
 
 // GetCustomer returns a single customer by ID.
-func (s *service) GetCustomer(ctx context.Context, storeID int64, id int64) (*domain.Customer, error) {
+func (s *service) GetCustomer(ctx context.Context, storeID, id int64) (*domain.Customer, error) {
 	return s.repo.GetByID(ctx, storeID, id)
 }

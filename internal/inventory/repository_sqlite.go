@@ -38,7 +38,7 @@ func (r *ProductPGRepository) ListProducts(ctx context.Context, storeID int64, s
 }
 
 // GetProductByID retrieves a single product with its variants for a given store.
-func (r *ProductPGRepository) GetProductByID(ctx context.Context, storeID int64, productID int64) (*domain.Product, error) {
+func (r *ProductPGRepository) GetProductByID(ctx context.Context, storeID, productID int64) (*domain.Product, error) {
 	var product domain.Product
 	err := r.db.WithContext(ctx).Preload("Variants").Where("store_id = ? AND id = ?", storeID, productID).First(&product).Error
 	if err != nil {

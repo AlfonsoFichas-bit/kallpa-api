@@ -19,7 +19,7 @@ func NewCustomerRepository(db *gorm.DB) *CustomerPGRepository {
 }
 
 // FindByTelegramID retrieves a customer for a given store by their Telegram ID.
-func (r *CustomerPGRepository) FindByTelegramID(ctx context.Context, storeID int64, telegramID int64) (*domain.Customer, error) {
+func (r *CustomerPGRepository) FindByTelegramID(ctx context.Context, storeID, telegramID int64) (*domain.Customer, error) {
 	var customer domain.Customer
 	err := r.db.WithContext(ctx).Preload("TelegramIdentity").
 		Where("store_id = ? AND telegram_id = ?", storeID, telegramID).
@@ -36,7 +36,7 @@ func (r *CustomerPGRepository) FindByTelegramID(ctx context.Context, storeID int
 }
 
 // UpsertByTelegramID creates or updates a customer linked to a Telegram ID idempotently.
-func (r *CustomerPGRepository) UpsertByTelegramID(ctx context.Context, storeID int64, telegramID int64, name string) (*domain.Customer, error) {
+func (r *CustomerPGRepository) UpsertByTelegramID(ctx context.Context, storeID, telegramID int64, name string) (*domain.Customer, error) {
 	var customer *domain.Customer
 
 	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
@@ -102,7 +102,7 @@ func (r *CustomerPGRepository) ListByStore(ctx context.Context, storeID int64, s
 }
 
 // GetByID retrieves a customer by ID.
-func (r *CustomerPGRepository) GetByID(ctx context.Context, storeID int64, customerID int64) (*domain.Customer, error) {
+func (r *CustomerPGRepository) GetByID(ctx context.Context, storeID, customerID int64) (*domain.Customer, error) {
 	var customer domain.Customer
 	err := r.db.WithContext(ctx).Where("store_id = ? AND id = ?", storeID, customerID).First(&customer).Error
 	if err != nil {

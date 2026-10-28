@@ -14,7 +14,7 @@ type ProductSearchQuery struct {
 // ProductRepository defines operations for the inventory module.
 type ProductRepository interface {
 	ListProducts(ctx context.Context, storeID int64, query ProductSearchQuery) ([]domain.Product, error)
-	GetProductByID(ctx context.Context, storeID int64, productID int64) (*domain.Product, error)
+	GetProductByID(ctx context.Context, storeID, productID int64) (*domain.Product, error)
 	GetVariantByID(ctx context.Context, variantID int64) (*domain.ProductVariant, error)
 	UpdateStock(ctx context.Context, variantID int64, delta int) error
 	LowStockQuery(ctx context.Context, storeID int64, threshold int) ([]domain.ProductVariant, error)

@@ -13,14 +13,14 @@ type mockCustomerRepo struct {
 	customer *domain.Customer
 }
 
-func (m *mockCustomerRepo) FindByTelegramID(ctx context.Context, storeID int64, telegramID int64) (*domain.Customer, error) {
+func (m *mockCustomerRepo) FindByTelegramID(ctx context.Context, storeID, telegramID int64) (*domain.Customer, error) {
 	if m.customer != nil && m.customer.StoreID == storeID && *m.customer.TelegramID == telegramID {
 		return m.customer, nil
 	}
 	return nil, nil
 }
 
-func (m *mockCustomerRepo) UpsertByTelegramID(ctx context.Context, storeID int64, telegramID int64, name string) (*domain.Customer, error) {
+func (m *mockCustomerRepo) UpsertByTelegramID(ctx context.Context, storeID, telegramID int64, name string) (*domain.Customer, error) {
 	if m.customer != nil && m.customer.StoreID == storeID && *m.customer.TelegramID == telegramID {
 		m.customer.FullName = &name
 		return m.customer, nil
@@ -51,7 +51,7 @@ func (m *mockCustomerRepo) ListByStore(ctx context.Context, storeID int64, statu
 	return []domain.Customer{}, nil
 }
 
-func (m *mockCustomerRepo) GetByID(ctx context.Context, storeID int64, customerID int64) (*domain.Customer, error) {
+func (m *mockCustomerRepo) GetByID(ctx context.Context, storeID, customerID int64) (*domain.Customer, error) {
 	if m.customer != nil && m.customer.ID == customerID && m.customer.StoreID == storeID {
 		return m.customer, nil
 	}

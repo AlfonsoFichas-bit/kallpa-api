@@ -1,6 +1,7 @@
 package inventory
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -81,7 +82,7 @@ func (h *InventoryHandler) AdjustStock(c *echo.Context) error {
 
 	err := h.service.AdjustStock(c.Request().Context(), *claims.StoreID, req.VariantID, req.Delta)
 	if err != nil {
-		if err == ErrInsufficientStock {
+		if errors.Is(err, ErrInsufficientStock) {
 			return c.JSON(http.StatusConflict, map[string]string{"message": err.Error()})
 		}
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

@@ -42,8 +42,9 @@ func main() {
 	router := kallpahttp.NewRouter(database, cfg)
 
 	srv := &http.Server{
-		Addr:    ":" + cfg.Port,
-		Handler: router,
+		Addr:              ":" + cfg.Port,
+		Handler:           router,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	// 5. Start Server gracefully

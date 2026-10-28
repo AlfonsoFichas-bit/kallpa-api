@@ -38,7 +38,13 @@ func TestMain(m *testing.M) {
 	}
 	testDB = database
 
-	_ = testDB.AutoMigrate(&domain.User{})
+	_ = testDB.AutoMigrate(
+		&domain.User{},
+		&domain.Product{},
+		&domain.ProductVariant{},
+		&domain.TelegramIdentity{},
+		&domain.Customer{},
+	)
 
 	testRouter = kallpahttp.NewRouter(testDB, cfg)
 

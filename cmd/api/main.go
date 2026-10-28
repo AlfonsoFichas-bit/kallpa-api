@@ -34,7 +34,13 @@ func main() {
 	}
 	slog.Info("Database connected", "db_name", cfg.DBName)
 
-	if err := database.AutoMigrate(&kallpadomain.User{}); err != nil {
+	if err := database.AutoMigrate(
+		&kallpadomain.User{},
+		&kallpadomain.Product{},
+		&kallpadomain.ProductVariant{},
+		&kallpadomain.TelegramIdentity{},
+		&kallpadomain.Customer{},
+	); err != nil {
 		log.Fatalf("Database migration failed: %v", err)
 	}
 

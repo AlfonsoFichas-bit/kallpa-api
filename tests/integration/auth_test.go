@@ -49,6 +49,8 @@ func TestMain(m *testing.M) {
 		&domain.DeliveryZone{},
 		&domain.ChatSession{},
 		&domain.AiLog{},
+		&domain.Notification{},
+		&domain.Store{},
 	)
 
 	testRouter = kallpahttp.NewRouter(testDB, cfg)

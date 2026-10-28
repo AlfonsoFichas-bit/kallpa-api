@@ -45,6 +45,8 @@ func main() {
 		&kallpadomain.DeliveryZone{},
 		&kallpadomain.ChatSession{},
 		&kallpadomain.AiLog{},
+		&kallpadomain.Notification{},
+		&kallpadomain.Store{},
 	); err != nil {
 		log.Fatalf("Database migration failed: %v", err)
 	}

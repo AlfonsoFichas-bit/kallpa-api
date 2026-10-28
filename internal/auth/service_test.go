@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -71,13 +72,13 @@ func TestAuthService_Login(t *testing.T) {
 
 	// Test invalid password
 	_, err = svc.Login(context.Background(), "test@example.com", "wrongpass")
-	if err != ErrInvalidCredentials {
+	if !errors.Is(err, ErrInvalidCredentials) {
 		t.Errorf("expected ErrInvalidCredentials on wrong password, got %v", err)
 	}
 
 	// Test invalid email
 	_, err = svc.Login(context.Background(), "wrong@example.com", "securepass")
-	if err != ErrInvalidCredentials {
+	if !errors.Is(err, ErrInvalidCredentials) {
 		t.Errorf("expected ErrInvalidCredentials on wrong email, got %v", err)
 	}
 }
@@ -118,7 +119,7 @@ func TestAuthService_RefreshAndValidate(t *testing.T) {
 
 	// Test refresh with access token (should fail)
 	_, err = svc.Refresh(context.Background(), tokens.AccessToken)
-	if err != ErrInvalidToken {
+	if !errors.Is(err, ErrInvalidToken) {
 		t.Errorf("expected ErrInvalidToken when refreshing with access token, got %v", err)
 	}
 

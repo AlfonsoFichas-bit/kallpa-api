@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// Init creates and sets the default global slog logger.
 func Init(level string) *slog.Logger {
 	var l slog.Level
 	switch level {

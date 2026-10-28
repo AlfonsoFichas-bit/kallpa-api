@@ -12,16 +12,21 @@ import (
 )
 
 var (
+	// ErrInvalidCredentials indicates that login email or password are incorrect.
 	ErrInvalidCredentials = errors.New("invalid credentials")
-	ErrUserNotFound       = errors.New("user not found")
-	ErrInvalidToken       = errors.New("invalid token")
+	// ErrUserNotFound indicates that the specified user could not be found.
+	ErrUserNotFound = errors.New("user not found")
+	// ErrInvalidToken indicates that a provided token is missing, malformed or expired.
+	ErrInvalidToken = errors.New("invalid token")
 )
 
+// TokenResponse contains both access and refresh JWT tokens.
 type TokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
 
+// CustomClaims embeds standard claims alongside application specific ones.
 type CustomClaims struct {
 	UserID  int64           `json:"user_id"`
 	StoreID *int64          `json:"store_id"`
@@ -30,6 +35,7 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
+// AuthService outlines operations regarding authentication.
 type AuthService interface {
 	Login(ctx context.Context, email, password string) (*TokenResponse, error)
 	Refresh(ctx context.Context, refreshToken string) (*TokenResponse, error)
@@ -42,6 +48,7 @@ type service struct {
 	jwtSecret string
 }
 
+// NewService creates a new authentication service.
 func NewService(repo UserRepository, jwtSecret string) AuthService {
 	return &service{
 		repo:      repo,

@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config represents the application configuration settings.
 type Config struct {
 	DBName    string
 	Port      string
@@ -14,6 +15,7 @@ type Config struct {
 	JWTSecret string
 }
 
+// Load retrieves configuration from environment variables and an optional .env file.
 func Load() *Config {
 	// Try to load .env file, ignore error if it doesn't exist
 	_ = godotenv.Load()

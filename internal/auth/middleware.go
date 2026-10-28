@@ -8,9 +8,10 @@ import (
 	"kallpa-api/internal/domain"
 )
 
+// ContextKeyUser is the key used to store claims in Echo context.
 const ContextKeyUser = "user_claims"
 
-// Middleware to extract and validate JWT from Authorization header
+// AuthMiddleware creates a middleware to extract and validate JWT from Authorization header.
 func AuthMiddleware(authService AuthService) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c *echo.Context) error {
@@ -20,7 +21,7 @@ func AuthMiddleware(authService AuthService) echo.MiddlewareFunc {
 			}
 
 			parts := strings.Split(authHeader, " ")
-			if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+			if len(parts) != 2 || !strings.EqualFold(parts[0], "bearer") {
 				return c.JSON(http.StatusUnauthorized, ErrorResponse{Message: "invalid authorization header format"})
 			}
 
@@ -38,7 +39,7 @@ func AuthMiddleware(authService AuthService) echo.MiddlewareFunc {
 	}
 }
 
-// Helper middleware to enforce specific roles
+// RequireRole creates a middleware helper to enforce specific roles.
 func RequireRole(allowedRoles ...domain.UserRole) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c *echo.Context) error {
@@ -64,6 +65,7 @@ func RequireRole(allowedRoles ...domain.UserRole) echo.MiddlewareFunc {
 	}
 }
 
+// GetUserClaims retrieves the user claims extracted from context.
 func GetUserClaims(c *echo.Context) *CustomClaims {
 	claims, _ := c.Get(ContextKeyUser).(*CustomClaims)
 	return claims

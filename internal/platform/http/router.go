@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
 	"time"
@@ -14,14 +15,17 @@ import (
 	"kallpa-api/internal/config"
 )
 
+// CustomValidator wraps the standard validator for Echo.
 type CustomValidator struct {
 	validator *validator.Validate
 }
 
+// Validate executes the validation rules defined in the structs.
 func (cv *CustomValidator) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
 }
 
+// NewRouter initializes and configures the Echo web framework.
 func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
@@ -82,7 +86,8 @@ func slogMiddleware() echo.MiddlewareFunc {
 			}
 
 			if err != nil {
-				if he, ok := err.(*echo.HTTPError); ok {
+				var he *echo.HTTPError
+				if errors.As(err, &he) {
 					status = he.Code
 				} else if status == 0 {
 					status = http.StatusInternalServerError

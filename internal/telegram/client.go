@@ -11,7 +11,7 @@ import (
 // Client handles interaction with the Telegram Bot API.
 type Client interface {
 	SendMessage(ctx context.Context, botToken string, chatID int64, text string) error
-	GetFileURL(ctx context.Context, botToken string, fileID string) (string, error)
+	GetFileURL(ctx context.Context, botToken, fileID string) (string, error)
 }
 
 type client struct {
@@ -44,7 +44,7 @@ func (c *client) SendMessage(ctx context.Context, botToken string, chatID int64,
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("telegram API error: status %d", resp.StatusCode)
@@ -53,10 +53,10 @@ func (c *client) SendMessage(ctx context.Context, botToken string, chatID int64,
 	return nil
 }
 
-func (c *client) GetFileURL(ctx context.Context, botToken string, fileID string) (string, error) {
+func (c *client) GetFileURL(ctx context.Context, botToken, fileID string) (string, error) {
 	url := fmt.Sprintf("https://api.telegram.org/bot%s/getFile?file_id=%s", botToken, fileID)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +65,7 @@ func (c *client) GetFileURL(ctx context.Context, botToken string, fileID string)
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("telegram API error: status %d", resp.StatusCode)

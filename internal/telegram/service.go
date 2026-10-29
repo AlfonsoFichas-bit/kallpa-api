@@ -100,6 +100,7 @@ func (s *service) ProcessWebhook(ctx context.Context, botToken string, update *U
 		res, err := s.chatSvc.ProcessMessage(ctx, req)
 		if err != nil {
 			slog.Error("Failed to process message with AI", "error", err)
+			//nolint:misspell // "problemas" is Spanish
 			_ = s.client.SendMessage(ctx, botToken, chatID, "Lo siento, estoy teniendo problemas técnicos en este momento.")
 			return err
 		}
@@ -126,9 +127,9 @@ func (s *service) getStoreByToken(ctx context.Context, token string) (*domain.St
 	if err != nil {
 		return nil, err
 	}
-	for _, st := range storesList {
-		if st.BotToken != nil && *st.BotToken == token {
-			return &st, nil
+	for i := range storesList {
+		if storesList[i].BotToken != nil && *storesList[i].BotToken == token {
+			return &storesList[i], nil
 		}
 	}
 	return nil, nil
@@ -167,7 +168,7 @@ func (s *service) resetChatSession(ctx context.Context, storeID, customerTelegra
 	return nil
 }
 
-func (s *service) handlePhoto(ctx context.Context, storeID int64, botToken string, customerTelegramID int64, chatID int64, photos []PhotoSize) error {
+func (s *service) handlePhoto(ctx context.Context, storeID int64, botToken string, customerTelegramID, chatID int64, photos []PhotoSize) error {
 	// Get highest resolution photo (last in array)
 	bestPhoto := photos[len(photos)-1]
 

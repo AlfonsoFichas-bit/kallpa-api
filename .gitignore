@@ -1,38 +1,5 @@
-# Binarios compilados
-bin/
 api_bin
-*.exe
-
-# Base de datos SQLite y archivos auxiliares (WAL/SHM/journal)
+bin/
 kallpa.db
-*.db-wal
-*.db-shm
-*.db-journal
-
-# Variables de entorno (deja fuera .env, pero versiona .env.example si existe)
 .env*
-!.env.example
-
-# Datos y logs en tiempo de ejecución
 data/
-logs/
-*.log
-
-# Go
-vendor/
-.go-build/
-*.test
-*.prof
-coverage.out
-coverage.html
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Sistema operativo
-.DS_Store
-Thumbs.db
-desktop.ini

@@ -22,6 +22,7 @@ import (
 	"kallpa-api/internal/sales"
 	"kallpa-api/internal/shipping"
 	"kallpa-api/internal/stores"
+	"kallpa-api/internal/telegram"
 )
 
 // CustomValidator wraps the standard validator for Echo.
@@ -128,6 +129,12 @@ func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 	dashboardService := dashboard.NewService(dashboardRepo)
 	dashboardHandler := dashboard.NewHandler(dashboardService)
 	dashboard.RegisterHandlers(protected, dashboardHandler)
+
+	// Public Webhook endpoints
+	telegramClient := telegram.NewClient()
+	telegramService := telegram.NewService(telegramClient, storeService, chatService, salesService, chatRepo, customerService)
+	telegramHandler := telegram.NewHandler(telegramService)
+	telegram.RegisterHandlers(v1, telegramHandler)
 
 	return e
 }

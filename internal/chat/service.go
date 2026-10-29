@@ -121,10 +121,9 @@ func (s *service) ProcessMessage(ctx context.Context, req *MessageRequest) (*Mes
 	// In a real scenario, the AI provider parses a JSON payload with variant_id and quantity from the message context.
 	// For this test task, we intercept the "confirm_order" intent to trigger an actual order creation using hardcoded values
 	// (or derived from contextData). For simplicity in demonstrating 8.4, we'll try to create a dummy order for variant ID 1.
-	switch intent {
-	case "add_to_cart":
+	if intent == "add_to_cart" {
 		res.RequiresConfirmation = true
-	case "confirm_order":
+	} else if intent == "confirm_order" {
 		// Attempt to create an order
 		variantID := int64(1)
 		orderReq := &domain.Order{

@@ -16,6 +16,7 @@ import (
 	"kallpa-api/internal/chat"
 	"kallpa-api/internal/config"
 	"kallpa-api/internal/customers"
+	"kallpa-api/internal/dashboard"
 	"kallpa-api/internal/inventory"
 	"kallpa-api/internal/notifications"
 	"kallpa-api/internal/sales"
@@ -121,6 +122,12 @@ func NewRouter(db *gorm.DB, cfg *config.Config) *echo.Echo {
 	storeService := stores.NewService(storeRepo)
 	storeHandler := stores.NewHandler(storeService)
 	stores.RegisterHandlers(protected, storeHandler)
+
+	// Dashboard module
+	dashboardRepo := dashboard.NewRepository(db)
+	dashboardService := dashboard.NewService(dashboardRepo)
+	dashboardHandler := dashboard.NewHandler(dashboardService)
+	dashboard.RegisterHandlers(protected, dashboardHandler)
 
 	return e
 }

@@ -20,6 +20,17 @@ func NewOrderRepository(db *gorm.DB) *OrderPGRepository {
 	return &OrderPGRepository{db: db}
 }
 
+// ListOrders retrieves orders for a store, optionally filtering by status.
+func (r *OrderPGRepository) ListOrders(ctx context.Context, storeID int64, status string) ([]domain.Order, error) {
+	var orders []domain.Order
+	q := r.db.WithContext(ctx).Preload("Customer").Where("store_id = ?", storeID)
+	if status != "" {
+		q = q.Where("status = ?", status)
+	}
+	err := q.Order("created_at DESC").Find(&orders).Error
+	return orders, err
+}
+
 // CreateOrder safely deduces stock and creates an order transactionally.
 func (r *OrderPGRepository) CreateOrder(ctx context.Context, order *domain.Order) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {

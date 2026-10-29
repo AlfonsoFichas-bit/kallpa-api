@@ -28,6 +28,14 @@ func (m *mockDeliveryZoneRepo) GetByID(ctx context.Context, storeID, zoneID int6
 	return nil, nil
 }
 
+func (m *mockDeliveryZoneRepo) CreateZone(ctx context.Context, zone *domain.DeliveryZone) error {
+	return nil
+}
+
+func (m *mockDeliveryZoneRepo) DeleteZone(ctx context.Context, storeID, zoneID int64) error {
+	return nil
+}
+
 // Mock Sales Service just for testing RecalculateOrderTotal
 type mockSalesService struct {
 	sales.SalesService // Embed interface to satisfy it, only override what we need

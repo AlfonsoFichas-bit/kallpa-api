@@ -18,4 +18,5 @@ type ProductRepository interface {
 	GetVariantByID(ctx context.Context, variantID int64) (*domain.ProductVariant, error)
 	UpdateStock(ctx context.Context, variantID int64, delta int) error
 	LowStockQuery(ctx context.Context, storeID int64, threshold int) ([]domain.ProductVariant, error)
+	ToggleProductStatus(ctx context.Context, storeID, productID int64) error
 }

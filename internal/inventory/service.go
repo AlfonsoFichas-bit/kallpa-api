@@ -13,6 +13,7 @@ type InventoryService interface {
 	GetProduct(ctx context.Context, storeID, productID int64) (*domain.Product, error)
 	AdjustStock(ctx context.Context, storeID, variantID int64, delta int) error
 	GetLowStock(ctx context.Context, storeID int64, threshold int) ([]domain.ProductVariant, error)
+	ToggleProductStatus(ctx context.Context, storeID, productID int64) error
 }
 
 type service struct {
@@ -60,4 +61,9 @@ func (s *service) AdjustStock(ctx context.Context, storeID, variantID int64, del
 // GetLowStock returns variants below the threshold.
 func (s *service) GetLowStock(ctx context.Context, storeID int64, threshold int) ([]domain.ProductVariant, error) {
 	return s.repo.LowStockQuery(ctx, storeID, threshold)
+}
+
+// ToggleProductStatus toggles a product between active and inactive.
+func (s *service) ToggleProductStatus(ctx context.Context, storeID, productID int64) error {
+	return s.repo.ToggleProductStatus(ctx, storeID, productID)
 }

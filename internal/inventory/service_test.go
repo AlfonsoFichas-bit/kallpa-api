@@ -60,6 +60,10 @@ func (m *mockProductRepo) LowStockQuery(ctx context.Context, storeID int64, thre
 	return []domain.ProductVariant{}, nil
 }
 
+func (m *mockProductRepo) ToggleProductStatus(ctx context.Context, storeID, productID int64) error {
+	return nil
+}
+
 func TestInventoryService_AdjustStock(t *testing.T) {
 	repo := &mockProductRepo{
 		products: []domain.Product{

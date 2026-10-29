@@ -8,6 +8,7 @@ import (
 
 // OrderRepository defines operations for the sales module.
 type OrderRepository interface {
+	ListOrders(ctx context.Context, storeID int64, status string) ([]domain.Order, error)
 	CreateOrder(ctx context.Context, order *domain.Order) error
 	GetByID(ctx context.Context, storeID, orderID int64) (*domain.Order, error)
 	UpdateStatus(ctx context.Context, storeID, orderID int64, newStatus domain.OrderStatus) error

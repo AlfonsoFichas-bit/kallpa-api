@@ -114,10 +114,33 @@ func (h *InventoryHandler) GetLowStock(c *echo.Context) error {
 	return c.JSON(http.StatusOK, variants)
 }
 
+// ToggleProduct handles PATCH /v1/products/:id/toggle
+func (h *InventoryHandler) ToggleProduct(c *echo.Context) error {
+	claims := auth.GetUserClaims(c)
+	if claims == nil || claims.StoreID == nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "store context required"})
+	}
+
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "invalid product id"})
+	}
+
+	if err := h.service.ToggleProductStatus(c.Request().Context(), *claims.StoreID, id); err != nil {
+		if err.Error() == "record not found" {
+			return c.JSON(http.StatusNotFound, map[string]string{"message": "product not found"})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "error toggling product"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "product status toggled successfully"})
+}
+
 // RegisterHandlers mounts inventory routes to the given group.
 func RegisterHandlers(g *echo.Group, h *InventoryHandler) {
 	g.GET("/products", h.ListProducts)
 	g.GET("/products/:id", h.GetProduct)
+	g.PATCH("/products/:id/toggle", h.ToggleProduct)
 	g.POST("/stock-movements", h.AdjustStock)
 	g.GET("/variants/low-stock", h.GetLowStock)
 }

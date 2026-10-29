@@ -39,6 +39,22 @@ func NewSalesHandler(service SalesService) *SalesHandler {
 	return &SalesHandler{service: service}
 }
 
+// ListOrders handles GET /v1/orders
+func (h *SalesHandler) ListOrders(c *echo.Context) error {
+	claims := auth.GetUserClaims(c)
+	if claims == nil || claims.StoreID == nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "store context required"})
+	}
+
+	status := c.QueryParam("status")
+	orders, err := h.service.ListOrders(c.Request().Context(), *claims.StoreID, status)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "error fetching orders"})
+	}
+
+	return c.JSON(http.StatusOK, orders)
+}
+
 // CreateOrder handles POST /v1/orders
 func (h *SalesHandler) CreateOrder(c *echo.Context) error {
 	claims := auth.GetUserClaims(c)
@@ -152,6 +168,7 @@ func (h *SalesHandler) UpdateOrderStatus(c *echo.Context) error {
 
 // RegisterHandlers mounts sales routes to the given group.
 func RegisterHandlers(g *echo.Group, h *SalesHandler) {
+	g.GET("/orders", h.ListOrders)
 	g.POST("/orders", h.CreateOrder)
 	g.GET("/orders/:id", h.GetOrder)
 	g.PATCH("/orders/:id/status", h.UpdateOrderStatus)

@@ -30,6 +30,10 @@ func (m *mockOrderRepo) GetByID(ctx context.Context, storeID, orderID int64) (*d
 	return nil, nil
 }
 
+func (m *mockOrderRepo) ListOrders(ctx context.Context, storeID int64, status string) ([]domain.Order, error) {
+	return nil, nil
+}
+
 func (m *mockOrderRepo) UpdateStatus(ctx context.Context, storeID, orderID int64, newStatus domain.OrderStatus) error {
 	for i := range m.orders {
 		if m.orders[i].ID == orderID && m.orders[i].StoreID == storeID {
@@ -95,6 +99,9 @@ func (m *mockProductRepo) UpdateStock(ctx context.Context, variantID int64, delt
 }
 func (m *mockProductRepo) LowStockQuery(ctx context.Context, storeID int64, threshold int) ([]domain.ProductVariant, error) {
 	return nil, nil
+}
+func (m *mockProductRepo) ToggleProductStatus(ctx context.Context, storeID, productID int64) error {
+	return nil
 }
 
 type mockCustomerRepo struct {

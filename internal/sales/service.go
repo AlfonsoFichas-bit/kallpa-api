@@ -19,6 +19,7 @@ var (
 
 // SalesService defines business operations for orders and sales.
 type SalesService interface {
+	ListOrders(ctx context.Context, storeID int64, status string) ([]domain.Order, error)
 	CreateOrder(ctx context.Context, storeID int64, order *domain.Order) (*domain.Order, error)
 	GetOrder(ctx context.Context, storeID, orderID int64) (*domain.Order, error)
 	UpdateOrderStatus(ctx context.Context, storeID, orderID int64, newStatus domain.OrderStatus) error
@@ -38,6 +39,11 @@ func NewService(repo OrderRepository, inventoryRepo inventory.ProductRepository,
 		inventoryRepo: inventoryRepo,
 		customerRepo:  customerRepo,
 	}
+}
+
+// ListOrders retrieves a list of orders.
+func (s *service) ListOrders(ctx context.Context, storeID int64, status string) ([]domain.Order, error) {
+	return s.repo.ListOrders(ctx, storeID, status)
 }
 
 // CreateOrder validates items, calculates totals, handles idempotency, and saves.

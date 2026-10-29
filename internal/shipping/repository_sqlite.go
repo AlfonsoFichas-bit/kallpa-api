@@ -43,3 +43,23 @@ func (r *DeliveryZonePGRepository) GetByID(ctx context.Context, storeID, zoneID 
 	}
 	return &zone, nil
 }
+
+// CreateZone inserts a new delivery zone.
+func (r *DeliveryZonePGRepository) CreateZone(ctx context.Context, zone *domain.DeliveryZone) error {
+	return r.db.WithContext(ctx).Create(zone).Error
+}
+
+// DeleteZone permanently removes a delivery zone.
+func (r *DeliveryZonePGRepository) DeleteZone(ctx context.Context, storeID, zoneID int64) error {
+	res := r.db.WithContext(ctx).
+		Where("store_id = ? AND id = ?", storeID, zoneID).
+		Delete(&domain.DeliveryZone{})
+
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}

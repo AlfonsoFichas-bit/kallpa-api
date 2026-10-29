@@ -115,3 +115,19 @@ func (r *ProductPGRepository) LowStockQuery(ctx context.Context, storeID int64, 
 		Find(&variants).Error
 	return variants, err
 }
+
+// ToggleProductStatus flips a product's active status.
+func (r *ProductPGRepository) ToggleProductStatus(ctx context.Context, storeID, productID int64) error {
+	var product domain.Product
+	err := r.db.WithContext(ctx).Where("id = ? AND store_id = ?", productID, storeID).First(&product).Error
+	if err != nil {
+		return err
+	}
+
+	newStatus := "active"
+	if product.Status == "active" {
+		newStatus = "inactive"
+	}
+
+	return r.db.WithContext(ctx).Model(&product).Update("status", newStatus).Error
+}

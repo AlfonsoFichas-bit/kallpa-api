@@ -19,6 +19,8 @@ var (
 type ShippingService interface {
 	ListStoreZones(ctx context.Context, storeID int64) ([]domain.DeliveryZone, error)
 	AssignZoneToOrder(ctx context.Context, storeID, orderID, zoneID int64) error
+	CreateZone(ctx context.Context, storeID int64, name string, price decimal.Decimal) (*domain.DeliveryZone, error)
+	DeleteZone(ctx context.Context, storeID, zoneID int64) error
 }
 
 type service struct {
@@ -73,4 +75,27 @@ func (s *service) AssignZoneToOrder(ctx context.Context, storeID, orderID, zoneI
 
 	// Tell sales service to update the order
 	return s.salesService.RecalculateOrderTotal(ctx, storeID, orderID, deliveryCost)
+}
+
+// CreateZone adds a new delivery zone for a store.
+func (s *service) CreateZone(ctx context.Context, storeID int64, name string, price decimal.Decimal) (*domain.DeliveryZone, error) {
+	zone := &domain.DeliveryZone{
+		StoreID:  storeID,
+		Name:     name,
+		Price:    price,
+		IsActive: true,
+	}
+	if err := s.repo.CreateZone(ctx, zone); err != nil {
+		return nil, err
+	}
+	return zone, nil
+}
+
+// DeleteZone removes a delivery zone.
+func (s *service) DeleteZone(ctx context.Context, storeID, zoneID int64) error {
+	err := s.repo.DeleteZone(ctx, storeID, zoneID)
+	if err != nil && err.Error() == "record not found" {
+		return ErrZoneNotFound
+	}
+	return err
 }
